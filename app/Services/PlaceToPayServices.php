@@ -69,12 +69,12 @@ class PlaceToPayServices
     {
         $lastPayment = $order->lastPayment();
 
-        $result = Http::post(config('services.placetopay.url_base') . "api/session/$order->order_id", [
+        $result = Http::post(config('services.placetopay.url_base') . "api/session/$lastPayment->request_id", [
             'auth' => $this->getAuth()
         ]);
         $response = $result->json();
 
-        logger()->error('RESPONSE FIND', [
+        logger()->error('RESPONSE INFORMATION', [
             'response' => $response,
         ]);
 

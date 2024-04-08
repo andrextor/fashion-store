@@ -53,7 +53,7 @@ class PayTest extends TestCase
             ]
         );
 
-        $response = $this->postJson(route('order.pay', $this->product), $this->formData); // $this->post(route('order.pay', $this->product), $this->formData);
+        $response = $this->postJson(route('order.pay', $this->product), $this->formData);
         $response->assertStatus(302);
         $response->assertRedirect('https://checkout-co.placetopay.com/session/1/cc9b8690b1f7228c78b759ce27d7e80a');
         $this->assertDatabaseHas('orders', [
