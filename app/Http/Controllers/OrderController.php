@@ -6,7 +6,7 @@ use App\Http\Requests\PayOrderRequest;
 use App\Models\Order;
 use App\Models\Product;
 use App\Services\PaymentService;
-use Dnetix\Redirection\Message\RedirectInformation;
+use App\Services\PlaceToPayServices;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,11 +15,14 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
 
-    private PaymentService $paymentService;
+    // private PaymentService $paymentService;
 
-    public function __construct(PaymentService $paymentService)
+    private PlaceToPayServices $placeToPayServices;
+
+    public function __construct(PlaceToPayServices $placeToPayServices)
     {
-        $this->paymentService = $paymentService;
+        //$this->paymentService = $paymentService;
+        $this->placeToPayServices = $placeToPayServices;
     }
 
     public function create(Product $product): View
@@ -43,7 +46,7 @@ class OrderController extends Controller
     public function detail(Order $order): View
     {
         if (!$order->isPayed()) {
-            $this->paymentService->findPaymentPlaceToPay($order);
+            $this->placeToPayServices->findPaymentPlaceToPay($order);
         }
 
         return view('order.detail', compact('order'));
@@ -59,20 +62,18 @@ class OrderController extends Controller
     }
 
     public function search(): View
-    {        
+    {
         return view('order.search');
     }
 
     private function sendPayment(Order $order): RedirectResponse
     {
-        $response =  $this->paymentService->requestPlaceToPay($order);
+        $response = $this->placeToPayServices->requestPlaceToPay($order);
 
-        if ($response->isSuccessful()) {
-            return redirect($response->processUrl());
+        if ($response['status']['status'] == 'OK') {
+            return redirect($response['processUrl']);
         } else {
             return redirect(route('order.create', $order->product))->withErrors(trans('views.pay.error'));
         }
     }
-
-    
 }
