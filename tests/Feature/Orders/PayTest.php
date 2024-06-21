@@ -79,6 +79,7 @@ class PayTest extends TestCase
      */
     public function cantPayOrderBecausePaymentIsRejected(): void
     {
+
         $data = $this->getInformationMock([
 
             'status' => [
